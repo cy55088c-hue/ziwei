@@ -2504,26 +2504,26 @@
       </div>
 
       <div class="selection-options">
-        <div class="orientation-panel" role="group" aria-label="牌位正逆設定">
+        <div class="orientation-panel" role="group" aria-label="牌位正倒設定">
           <div class="orientation-item" data-orientation-group="main">
             <span class="orientation-name"><span class="dot" aria-hidden="true"></span>主星牌位</span>
-            <div class="orientation-toggle" role="group" aria-label="主星正位或逆位">
+            <div class="orientation-toggle" role="group" aria-label="主星正位或倒位">
               <button type="button" data-orientation="main" data-reversed="false" aria-pressed="true">正位</button>
-              <button type="button" data-orientation="main" data-reversed="true" aria-pressed="false">逆位</button>
+              <button type="button" data-orientation="main" data-reversed="true" aria-pressed="false">倒位</button>
             </div>
           </div>
           <div class="orientation-item" data-orientation-group="support">
             <span class="orientation-name"><span class="dot" aria-hidden="true"></span>輔星牌位</span>
-            <div class="orientation-toggle" role="group" aria-label="輔星正位或逆位">
+            <div class="orientation-toggle" role="group" aria-label="輔星正位或倒位">
               <button type="button" data-orientation="support" data-reversed="false" aria-pressed="true">正位</button>
-              <button type="button" data-orientation="support" data-reversed="true" aria-pressed="false">逆位</button>
+              <button type="button" data-orientation="support" data-reversed="true" aria-pressed="false">倒位</button>
             </div>
           </div>
           <div class="orientation-item" data-orientation-group="life">
             <span class="orientation-name"><span class="dot" aria-hidden="true"></span>長生牌位</span>
-            <div class="orientation-toggle" role="group" aria-label="長生正位或逆位">
+            <div class="orientation-toggle" role="group" aria-label="長生正位或倒位">
               <button type="button" data-orientation="life" data-reversed="false" aria-pressed="true">正位</button>
-              <button type="button" data-orientation="life" data-reversed="true" aria-pressed="false">逆位</button>
+              <button type="button" data-orientation="life" data-reversed="true" aria-pressed="false">倒位</button>
             </div>
           </div>
         </div>
@@ -3801,7 +3801,7 @@
           if (badgeEl) {
             const reversed = Boolean(state.orientations[kind]);
             badgeEl.hidden = !filled;
-            badgeEl.textContent = reversed ? "逆" : "正";
+            badgeEl.textContent = reversed ? "倒" : "正";
             badgeEl.classList.toggle("is-reversed", reversed);
           }
 
@@ -3890,7 +3890,7 @@
           window.setTimeout(() => chip.classList.remove("is-flash"), 700);
         });
 
-        showToast("已為你隨機抽出三張牌與正逆位");
+        showToast("已為你隨機抽出三張牌與正倒位");
       }
 
       function setReadingUI(busy) {
@@ -4590,7 +4590,7 @@
           button.addEventListener("click", () => resetGroup(button.dataset.reset));
         });
 
-        // 正位／逆位切換（事件代理）
+        // 正位／倒位切換（事件代理）
         els.summary.addEventListener("click", (event) => {
           const button = event.target.closest("[data-orientation]");
           if (!button || !els.summary.contains(button)) return;
