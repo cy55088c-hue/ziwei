@@ -4860,7 +4860,7 @@
 
       function followupSignature(reading, question, includeOriginal) {
         return JSON.stringify([
-          reading && reading.id,
+          reading ? (reading.id || readingSignature(reading)) : null,
           (question || "").trim(),
           Boolean(includeOriginal)
         ]);
@@ -5599,7 +5599,21 @@
          ============================================================ */
 
       function promptAvailable(tab) {
-        return tab === "followup" ? Boolean(state.currentReading) : isComplete();
+        if (tab === "followup") return isComplete() || Boolean(state.currentReading);
+        return isComplete();
+      }
+
+      function followupContext() {
+        if (state.currentReading) return state.currentReading;
+
+        const reading = collectReading();
+        return {
+          id: null,
+          selection: reading.selection,
+          orientations: reading.orientations,
+          question: reading.question,
+          answer: ""
+        };
       }
 
       function activePromptDraft(tab) {
@@ -5612,16 +5626,18 @@
 
       function generatedPrompt(tab) {
         if (tab === "followup") {
-          const reading = state.currentReading;
-          if (!reading) return "";
-          const question = els.followupInput.value.trim();
-          if (!question) {
-            return "（請先在上方的追問欄輸入問題，這裡會即時顯示實際送出的提示詞。）";
+          const reading = followupContext();
+          if (!reading.selection.main || !reading.selection.support || !reading.selection.life) {
+            return "";
           }
+
+          const question = els.followupInput.value.trim();
+          const includeOriginal = Boolean(els.includeOriginalToggle.checked) && Boolean(reading.answer);
+
           return buildFollowupPrompt(
             reading,
-            question,
-            Boolean(els.includeOriginalToggle.checked)
+            question || "【請在這裡輸入你的追問問題】",
+            includeOriginal
           );
         }
         return buildPrompt(collectReading());
@@ -5630,7 +5646,7 @@
       function promptSignatureFor(tab) {
         if (tab === "followup") {
           return followupSignature(
-            state.currentReading,
+            followupContext(),
             els.followupInput.value,
             Boolean(els.includeOriginalToggle.checked)
           );
@@ -5664,9 +5680,15 @@
         els.promptCount.textContent = length + " 字";
 
         const draft = activePromptDraft(tab);
-        els.promptHint.textContent = draft
-          ? "已編輯 · 送出時會使用你改過的版本"
-          : "唯讀模式 · 看到的內容就是送出的內容";
+        if (draft) {
+          els.promptHint.textContent = "已編輯 · 送出時會使用你改過的版本";
+        } else if (tab === "followup" && !state.currentReading) {
+          els.promptHint.textContent = "尚未有原解讀 · 只含牌面與問題，可按「編輯」換成你的追問";
+        } else if (tab === "followup" && !els.followupInput.value.trim()) {
+          els.promptHint.textContent = "尚未輸入追問 · 目前是可直接複製的範本，可按「編輯」換成你的問題";
+        } else {
+          els.promptHint.textContent = "唯讀模式 · 看到的內容就是送出的內容";
+        }
         els.promptHint.classList.toggle("is-dirty", Boolean(draft));
         els.promptEditBtn.textContent = state.promptEditing ? "完成" : "編輯";
         els.promptEditBtn.disabled = !available;
@@ -5738,7 +5760,7 @@
 
         const tab = preferredTab && promptAvailable(preferredTab)
           ? preferredTab
-          : (isComplete() ? "reading" : "followup");
+          : (state.currentReading ? "reading" : "followup");
 
         state.promptTab = promptAvailable(tab) ? tab : "reading";
         state.promptEditing = false;
@@ -6094,7 +6116,7 @@
         });
         els.errorSettingsBtn.addEventListener("click", openSettings);
         els.copyBtn.addEventListener("click", copyReading);
-        els.promptBtn.addEventListener("click", () => openPromptPanel("reading"));
+        els.promptBtn.addEventListener("click", () => openPromptPanel());
         els.historyBtn.addEventListener("click", openHistory);
 
         // 追問
