@@ -2375,6 +2375,37 @@
       font-size: 0.7rem;
     }
 
+    .copy-text {
+      width: 100%;
+      min-height: 220px;
+      max-height: 46dvh;
+      margin-top: 4px;
+      padding: 13px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--inset);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      resize: vertical;
+      white-space: pre-wrap;
+    }
+
+    .copy-text:focus {
+      border-color: transparent;
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .followup-head p {
+      flex: 1 1 240px;
+    }
+
+    .followup-head .btn {
+      flex: 0 0 auto;
+    }
+
     @media (max-width: 640px) {
       .followup-options {
         align-items: stretch;
@@ -3064,6 +3095,7 @@
             <div class="followup-head">
               <h3 id="followupTitle">追問</h3>
               <p>沿用這份解讀的三張牌，只送出牌面與問題，不含知識庫。</p>
+              <button class="btn btn-ghost btn-sm" id="copyFollowupsBtn" type="button" hidden>複製全部追問</button>
             </div>
 
             <div class="followup-thread" id="followupThread"></div>
@@ -3223,6 +3255,26 @@
       <div class="history-foot">
         <span class="history-count" id="historyCount">0 筆</span>
         <button class="btn btn-ghost btn-sm" id="clearHistoryBtn" type="button">清空全部</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 自動複製失敗時的手動複製視窗 -->
+  <dialog class="settings" id="copyDialog" aria-labelledby="copyTitle">
+    <div class="dialog-head">
+      <div>
+        <h2 id="copyTitle">手動複製</h2>
+        <p>瀏覽器沒有允許自動寫入剪貼簿</p>
+      </div>
+      <button class="icon-btn" id="closeCopyBtn" type="button" aria-label="關閉手動複製">✕</button>
+    </div>
+
+    <div class="settings-body">
+      <textarea class="copy-text" id="copyTextArea" readonly spellcheck="false" aria-label="要複製的內容"></textarea>
+      <p class="hint" id="copyHint">內容已為你選取。按 Ctrl+C（Mac：⌘C）即可複製，也可以長按選取。</p>
+      <div class="setting-actions">
+        <button class="btn btn-ghost" id="closeCopyBtn2" type="button">關閉</button>
+        <button class="btn btn-primary" id="copyRetryBtn" type="button">再試一次自動複製</button>
       </div>
     </div>
   </dialog>
@@ -4152,7 +4204,14 @@
         historySearch: $("#historySearch"),
         historyList: $("#historyList"),
         historyCount: $("#historyCount"),
-        clearHistoryBtn: $("#clearHistoryBtn")
+        clearHistoryBtn: $("#clearHistoryBtn"),
+        copyFollowupsBtn: $("#copyFollowupsBtn"),
+        copyDialog: $("#copyDialog"),
+        copyTextArea: $("#copyTextArea"),
+        copyHint: $("#copyHint"),
+        copyRetryBtn: $("#copyRetryBtn"),
+        closeCopyBtn: $("#closeCopyBtn"),
+        closeCopyBtn2: $("#closeCopyBtn2")
       };
 
       /* ============================================================
@@ -5018,6 +5077,7 @@
         state.currentReading = null;
         els.markdownOut.innerHTML = "";
         els.followupThread.innerHTML = "";
+        els.copyFollowupsBtn.hidden = true;
         els.followupStatus.textContent = "";
         els.followupStatus.classList.remove("is-error");
         els.copyBtn.disabled = true;
@@ -5307,40 +5367,91 @@
          ============================================================ */
 
       async function copyText(text) {
+        const value = String(text == null ? "" : text);
+        if (!value) return false;
+
         try {
-          if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(text);
+          if (navigator.clipboard && window.isSecureContext &&
+              typeof navigator.clipboard.writeText === "function") {
+            await navigator.clipboard.writeText(value);
             return true;
           }
         } catch (error) {
           /* 改用備援方案 */
         }
 
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.setAttribute("readonly", "");
+        textarea.setAttribute("aria-hidden", "true");
+        textarea.style.position = "fixed";
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.width = "1px";
+        textarea.style.height = "1px";
+        textarea.style.margin = "0";
+        textarea.style.padding = "0";
+        textarea.style.border = "0";
+        textarea.style.outline = "none";
+        textarea.style.boxShadow = "none";
+        textarea.style.background = "transparent";
+        textarea.style.opacity = "0.01";
+        document.body.appendChild(textarea);
+
+        let copied = false;
         try {
-          const textarea = document.createElement("textarea");
-          textarea.value = text;
-          textarea.setAttribute("readonly", "");
-          textarea.style.position = "fixed";
-          textarea.style.top = "0";
-          textarea.style.left = "0";
-          textarea.style.opacity = "0";
-          document.body.appendChild(textarea);
+          textarea.focus({ preventScroll: true });
           textarea.select();
-          const ok = document.execCommand("copy");
-          textarea.remove();
-          return ok;
+          textarea.setSelectionRange(0, value.length);
+          copied = document.execCommand("copy");
         } catch (error) {
+          copied = false;
+        } finally {
+          textarea.remove();
+        }
+
+        return copied;
+      }
+
+      function showCopyFallback(text) {
+        els.copyTextArea.value = String(text == null ? "" : text);
+        els.copyHint.textContent = "內容已為你選取。按 Ctrl+C（Mac：⌘C）即可複製，也可以長按選取。";
+
+        if (!els.copyDialog.open) {
+          if (typeof els.copyDialog.showModal === "function") {
+            els.copyDialog.showModal();
+          } else {
+            els.copyDialog.setAttribute("open", "");
+          }
+        }
+
+        window.requestAnimationFrame(() => {
+          els.copyTextArea.focus();
+          els.copyTextArea.select();
+        });
+      }
+
+      async function copyWithFeedback(text, successMessage) {
+        const value = String(text == null ? "" : text);
+        if (!value.trim()) {
+          showToast("沒有可複製的內容", "error");
           return false;
         }
+
+        const ok = await copyText(value);
+        if (ok) {
+          showToast(successMessage || "已複製內容");
+          return true;
+        }
+
+        showCopyFallback(value);
+        showToast("瀏覽器阻擋自動複製，已開啟手動複製", "error");
+        return false;
       }
 
       async function copyReading() {
         if (!state.lastMarkdown) return;
-        const ok = await copyText(state.lastMarkdown);
-        showToast(
-          ok ? "已複製解讀內容" : "複製失敗，請手動選取內容",
-          ok ? "success" : "error"
-        );
+        await copyWithFeedback(state.lastMarkdown, "已複製解讀內容");
       }
 
       /* ============================================================
@@ -5357,9 +5468,14 @@
         input.style.height = Math.min(input.scrollHeight, 150) + "px";
       }
 
+      function followupCopyText(item) {
+        return "【追問】\n" + item.question + "\n\n" + (item.answer || "");
+      }
+
       function renderFollowups() {
         const reading = state.currentReading;
         els.followupThread.innerHTML = "";
+        els.copyFollowupsBtn.hidden = !reading || !reading.followups.length;
         if (!reading || !reading.followups.length) return;
 
         reading.followups.forEach((item) => {
@@ -5389,18 +5505,28 @@
           copy.type = "button";
           copy.className = "btn btn-ghost btn-sm";
           copy.textContent = "複製這則";
-          copy.addEventListener("click", async () => {
-            const ok = await copyText("【追問】\n" + item.question + "\n\n" + (item.answer || ""));
-            showToast(
-              ok ? "已複製追問內容" : "複製失敗，請手動選取內容",
-              ok ? "success" : "error"
-            );
+          copy.addEventListener("click", () => {
+            copyWithFeedback(followupCopyText(item), "已複製追問內容");
           });
 
           actions.appendChild(copy);
           wrap.append(question, answer, actions);
           els.followupThread.appendChild(wrap);
         });
+      }
+
+      function copyAllFollowups() {
+        const reading = state.currentReading;
+        if (!reading || !reading.followups.length) {
+          showToast("還沒有可複製的追問", "error");
+          return;
+        }
+
+        const text = reading.followups
+          .map((item, index) => "【追問 " + (index + 1) + "】\n" + followupCopyText(item))
+          .join("\n\n---\n\n");
+
+        copyWithFeedback(text, "已複製全部追問");
       }
 
       async function sendFollowup() {
@@ -5645,11 +5771,7 @@
           return;
         }
 
-        const ok = await copyText(text);
-        showToast(
-          ok ? "已複製提示詞" : "複製失敗，請手動選取內容",
-          ok ? "success" : "error"
-        );
+        await copyWithFeedback(text, "已複製提示詞");
       }
 
       function syncPromptEntry() {
@@ -5848,6 +5970,14 @@
         }
       }
 
+      function closeCopyDialog() {
+        if (typeof els.copyDialog.close === "function") {
+          els.copyDialog.close();
+        } else {
+          els.copyDialog.removeAttribute("open");
+        }
+      }
+
       function deleteHistoryEntry(id) {
         state.history = state.history.filter((entry) => entry.id !== id);
         persistHistory();
@@ -6002,6 +6132,25 @@
         els.closeHistoryBtn.addEventListener("click", closeHistory);
         els.historyDialog.addEventListener("click", (event) => {
           if (event.target === els.historyDialog) closeHistory();
+        });
+
+        // 複製（含手動複製備援）
+        els.copyFollowupsBtn.addEventListener("click", copyAllFollowups);
+        els.closeCopyBtn.addEventListener("click", closeCopyDialog);
+        els.closeCopyBtn2.addEventListener("click", closeCopyDialog);
+        els.copyRetryBtn.addEventListener("click", async () => {
+          const ok = await copyText(els.copyTextArea.value);
+          if (ok) {
+            closeCopyDialog();
+            showToast("已複製內容");
+          } else {
+            els.copyHint.textContent = "仍然無法自動複製。請在文字框內按 Ctrl+C（Mac：⌘C），或長按選取後複製。";
+            els.copyTextArea.focus();
+            els.copyTextArea.select();
+          }
+        });
+        els.copyDialog.addEventListener("click", (event) => {
+          if (event.target === els.copyDialog) closeCopyDialog();
         });
 
         // 主題
