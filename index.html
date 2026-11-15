@@ -1964,6 +1964,442 @@
     }
 
     /* ============================================================
+       11b. 追問、提示詞與解讀紀錄
+       ============================================================ */
+    dialog.wide {
+      width: min(840px, calc(100vw - 32px));
+    }
+
+    .followup {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .followup-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px 14px;
+      margin-bottom: 12px;
+    }
+
+    .followup-head h3 {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .followup-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.55;
+    }
+
+    .followup-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .followup-item {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--inset);
+    }
+
+    .followup-q {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 0 0 8px;
+      color: var(--text-soft);
+      font-size: 0.85rem;
+      font-weight: 650;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .followup-tag {
+      flex: 0 0 auto;
+      padding: 0 8px;
+      border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.64rem;
+      font-weight: 650;
+      line-height: 1.75;
+    }
+
+    .followup-item .prose {
+      font-size: 0.9rem;
+    }
+
+    .followup-item .prose > :first-child {
+      margin-top: 0;
+    }
+
+    .followup-item .prose > :last-child {
+      margin-bottom: 0;
+    }
+
+    .followup-item-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .followup-form {
+      margin-top: 16px;
+    }
+
+    .followup-options {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 16px;
+      margin-top: 10px;
+    }
+
+    .followup-options .check-row {
+      margin: 0;
+    }
+
+    .followup-status {
+      min-height: 18px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.6;
+    }
+
+    .followup-status.is-error {
+      color: var(--danger);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      cursor: pointer;
+    }
+
+    .check-row input {
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+      margin: 3px 0 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .check-row small {
+      display: block;
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 400;
+      line-height: 1.55;
+    }
+
+    .prompt-tabs {
+      display: flex;
+      gap: 5px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--inset);
+    }
+
+    .prompt-tab {
+      display: inline-flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 620;
+      cursor: pointer;
+      transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+        color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+    }
+
+    .prompt-tab:hover:not(:disabled) {
+      color: var(--text);
+    }
+
+    .prompt-tab[aria-selected="true"] {
+      border-color: var(--border);
+      background: var(--card);
+      box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.35);
+      color: var(--text);
+      font-weight: 680;
+    }
+
+    .prompt-tab:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .edited-dot {
+      padding: 0 7px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 16%, transparent);
+      color: var(--accent);
+      font-size: 0.6rem;
+      font-weight: 650;
+      line-height: 1.75;
+    }
+
+    .prompt-view,
+    .prompt-editor {
+      width: 100%;
+      min-height: 240px;
+      max-height: 46dvh;
+      margin: 12px 0 0;
+      padding: 14px 16px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--inset);
+      color: var(--text);
+      font-size: 0.76rem;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .prompt-view {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .prompt-editor {
+      min-height: 280px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      resize: vertical;
+    }
+
+    .prompt-editor:focus {
+      border-color: transparent;
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .prompt-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 4px 12px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1.6;
+    }
+
+    .prompt-meta .is-dirty {
+      color: var(--accent);
+      font-weight: 650;
+    }
+
+    .prompt-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .prompt-details {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .prompt-details summary {
+      color: var(--text-soft);
+      font-size: 0.76rem;
+      font-weight: 620;
+      cursor: pointer;
+    }
+
+    .prompt-details pre {
+      max-height: 220px;
+      margin: 10px 0 0;
+      padding: 12px 14px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--inset);
+      font-size: 0.72rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .prompt-details p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.6;
+    }
+
+    .history-search {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--inset);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+    }
+
+    .history-search::placeholder {
+      color: var(--muted);
+    }
+
+    .history-search:focus {
+      border-color: transparent;
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 52dvh;
+      margin-top: 14px;
+      overflow: auto;
+    }
+
+    .history-item {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--inset);
+    }
+
+    .history-item-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 4px 12px;
+    }
+
+    .history-cards {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.84rem;
+      font-weight: 650;
+      line-height: 1.6;
+    }
+
+    .history-cards em {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    .history-meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.68rem;
+      white-space: nowrap;
+    }
+
+    .history-question {
+      margin: 6px 0 0;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+
+    .history-excerpt {
+      display: -webkit-box;
+      margin: 5px 0 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.65;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .history-item-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .history-empty {
+      margin: 20px 0 6px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .history-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .history-count {
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 640px) {
+      .followup-options {
+        align-items: stretch;
+      }
+
+      .followup-options .btn {
+        width: 100%;
+      }
+
+      .prompt-actions .btn,
+      .history-item-actions .btn {
+        flex: 1;
+      }
+
+      .prompt-view,
+      .prompt-editor {
+        max-height: 40dvh;
+      }
+
+      dialog.wide {
+        width: calc(100vw - 20px);
+      }
+    }
+
+    /* ============================================================
        12. 響應式設計
        ============================================================ */
     @media (max-width: 1100px) {
@@ -2572,6 +3008,8 @@
           <span class="status" id="resultStatus" data-tone="idle" aria-live="polite">
             <i aria-hidden="true"></i><span id="resultStatusText">待解讀</span>
           </span>
+          <button class="btn btn-ghost btn-sm" id="promptBtn" type="button" disabled>提示詞</button>
+          <button class="btn btn-ghost btn-sm" id="historyBtn" type="button">歷史</button>
           <button class="btn btn-ghost btn-sm" id="copyBtn" type="button" disabled>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="9" y="9" width="12" height="12" rx="2"></rect>
@@ -2621,6 +3059,46 @@
             <span aria-hidden="true">※</span>
             <span>本解讀由 AI 生成，僅供參考與自我探索，不構成醫療、法律或投資建議。請依自身情況做出判斷。</span>
           </div>
+
+          <section class="followup" id="followupPanel" aria-labelledby="followupTitle">
+            <div class="followup-head">
+              <h3 id="followupTitle">追問</h3>
+              <p>沿用這份解讀的三張牌，只送出牌面與問題，不含知識庫。</p>
+            </div>
+
+            <div class="followup-thread" id="followupThread"></div>
+
+            <div class="followup-form">
+              <div class="question-field">
+                <label class="question-label" for="followupInput">想再深入的地方<span>選填 · 500 字內</span></label>
+                <textarea
+                  class="question-input"
+                  id="followupInput"
+                  rows="2"
+                  maxlength="500"
+                  spellcheck="false"
+                  placeholder="例如：那我接下來三個月該先處理哪一件事？"
+                ></textarea>
+                <div class="question-meta">
+                  <span>追問不會重寫整份解讀，只回答你這次問的事。</span>
+                  <span id="followupCount">0 / 500</span>
+                </div>
+              </div>
+
+              <div class="followup-options">
+                <label class="check-row" for="includeOriginalToggle">
+                  <input type="checkbox" id="includeOriginalToggle" checked />
+                  <span>帶入原解讀<small>讓追問延續同一份解讀的語氣與結論（可關閉）</small></span>
+                </label>
+                <button class="btn btn-primary btn-sm" id="followupBtn" type="button">
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                  <span data-followup-label>送出追問</span>
+                </button>
+              </div>
+
+              <p class="followup-status" id="followupStatus" role="status" aria-live="polite"></p>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -2676,13 +3154,76 @@
             </svg>
           </button>
         </div>
-        <p class="hint">金鑰只儲存在此瀏覽器的本機儲存空間，僅會傳送給 DeepSeek。若使用公開裝置，離開前請記得清除。</p>
+        <p class="hint">金鑰只會存在你的瀏覽器，並且只會傳送給 DeepSeek。若使用公開裝置，離開前請記得清除。</p>
+        <label class="check-row" for="rememberKeyInput">
+          <input type="checkbox" id="rememberKeyInput" checked />
+          <span>記住金鑰<small>勾選＝存入 localStorage，關閉瀏覽器仍保留；不勾＝只存本次分頁（sessionStorage）。</small></span>
+        </label>
         <p class="hint"><a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">前往 DeepSeek 取得 API 金鑰 ↗</a></p>
         <div class="setting-actions">
           <button class="btn btn-ghost" id="clearKeyBtn" type="button">清除金鑰</button>
           <button class="btn btn-primary" id="saveSettingsBtn" type="button">儲存設定</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <!-- 提示詞檢視／編輯 -->
+  <dialog class="settings wide" id="promptDialog" aria-labelledby="promptTitle">
+    <div class="dialog-head">
+      <div>
+        <h2 id="promptTitle">提示詞</h2>
+        <p>這裡看到的就是實際送給 DeepSeek 的內容</p>
+      </div>
+      <button class="icon-btn" id="closePromptBtn" type="button" aria-label="關閉提示詞">✕</button>
+    </div>
+
+    <div class="settings-body">
+      <div class="prompt-tabs" role="tablist" aria-label="提示詞種類">
+        <button class="prompt-tab" id="promptTabReading" type="button" role="tab" data-prompt-tab="reading" aria-selected="true">初次解讀<span class="edited-dot" data-edited-for="reading" hidden>已編輯</span></button>
+        <button class="prompt-tab" id="promptTabFollowup" type="button" role="tab" data-prompt-tab="followup" aria-selected="false" disabled>追問<span class="edited-dot" data-edited-for="followup" hidden>已編輯</span></button>
+      </div>
+
+      <pre class="prompt-view" id="promptView" tabindex="0" aria-label="提示詞內容"></pre>
+      <textarea class="prompt-editor" id="promptEditor" spellcheck="false" aria-label="編輯提示詞" hidden></textarea>
+
+      <p class="prompt-meta">
+        <span id="promptCount">0 字</span>
+        <span id="promptHint">唯讀模式</span>
+      </p>
+
+      <div class="prompt-actions">
+        <button class="btn btn-ghost btn-sm" id="promptResetBtn" type="button" disabled>還原</button>
+        <button class="btn btn-ghost btn-sm" id="promptEditBtn" type="button">編輯</button>
+        <button class="btn btn-primary btn-sm" id="promptCopyBtn" type="button">複製提示詞</button>
+      </div>
+
+      <details class="prompt-details">
+        <summary>系統提示詞與請求參數</summary>
+        <pre id="promptSystem"></pre>
+        <p id="promptParams"></p>
+        <p>追問的提示詞永遠不含內嵌知識庫，只包含牌面、問題與（可選的）原解讀。</p>
+      </details>
+    </div>
+  </dialog>
+
+  <!-- 解讀紀錄 -->
+  <dialog class="settings wide" id="historyDialog" aria-labelledby="historyTitle">
+    <div class="dialog-head">
+      <div>
+        <h2 id="historyTitle">解讀紀錄</h2>
+        <p>只存在這部裝置，最多 20 筆</p>
+      </div>
+      <button class="icon-btn" id="closeHistoryBtn" type="button" aria-label="關閉解讀紀錄">✕</button>
+    </div>
+
+    <div class="settings-body">
+      <input class="history-search" id="historySearch" type="search" placeholder="搜尋牌面、問題或解讀內容…" aria-label="搜尋解讀紀錄" />
+      <div class="history-list" id="historyList"></div>
+      <div class="history-foot">
+        <span class="history-count" id="historyCount">0 筆</span>
+        <button class="btn btn-ghost btn-sm" id="clearHistoryBtn" type="button">清空全部</button>
+      </div>
     </div>
   </dialog>
 
@@ -3451,8 +3992,18 @@
         theme: "zwds.theme",
         selection: "zwds.selection",
         orientations: "zwds.orientations",
-        apiKey: "zwds.apiKey"
+        apiKey: "zwds.apiKey",
+        rememberKey: "zwds.rememberKey",
+        history: "zwds.history"
       });
+
+      const HISTORY_LIMIT = 20;
+      const FOLLOWUP_MAX_CHARS = 1500;
+      const FOLLOWUP_CONTEXT_MAX = 8000;
+      const FOLLOWUP_MAX_INPUT = 500;
+
+      const READING_SYSTEM_PROMPT =
+        "你是一位專業的紫微斗數牌卡解讀師，擅長以星曜象徵結合現代心理與生活情境。你會依據使用者提供的紫微牌卡知識庫來解讀牌義與正逆位，並把其中的規則轉化成白話建議。你總是以繁體中文（台灣用語）書寫，語氣溫暖、清晰、務實，重視自我覺察與可行動的建議，從不以恐懼或宿命論推動他人做決定。";
 
       const MAIN_STARS = Object.freeze([
         "紫微", "天機", "太陽", "武曲", "天同", "廉貞", "天府",
@@ -3522,7 +4073,13 @@
         loadingTimer: null,
         toastTimer: null,
         themeTimer: null,
-        lastErrorCode: ""
+        lastErrorCode: "",
+        currentReading: null,
+        followupBusy: false,
+        promptTab: "reading",
+        promptEditing: false,
+        promptDrafts: { reading: null, followup: null },
+        history: []
       };
 
       const $ = (selector, root = document) => root.querySelector(selector);
@@ -3555,7 +4112,16 @@
         resultStatus: $("#resultStatus"),
         resultStatusText: $("#resultStatusText"),
         copyBtn: $("#copyBtn"),
+        promptBtn: $("#promptBtn"),
+        historyBtn: $("#historyBtn"),
         markdownOut: $("#markdownOut"),
+        followupPanel: $("#followupPanel"),
+        followupThread: $("#followupThread"),
+        followupInput: $("#followupInput"),
+        followupCount: $("#followupCount"),
+        followupBtn: $("#followupBtn"),
+        followupStatus: $("#followupStatus"),
+        includeOriginalToggle: $("#includeOriginalToggle"),
         loadingTitle: $("#loadingTitle"),
         errorMessage: $("#errorMessage"),
         retryBtn: $("#retryBtn"),
@@ -3567,7 +4133,26 @@
         keyStatus: $("#keyStatus"),
         toggleKeyBtn: $("#toggleKeyBtn"),
         clearKeyBtn: $("#clearKeyBtn"),
-        saveSettingsBtn: $("#saveSettingsBtn")
+        rememberKeyInput: $("#rememberKeyInput"),
+        saveSettingsBtn: $("#saveSettingsBtn"),
+        promptDialog: $("#promptDialog"),
+        closePromptBtn: $("#closePromptBtn"),
+        promptView: $("#promptView"),
+        promptEditor: $("#promptEditor"),
+        promptCount: $("#promptCount"),
+        promptHint: $("#promptHint"),
+        promptSystem: $("#promptSystem"),
+        promptParams: $("#promptParams"),
+        promptResetBtn: $("#promptResetBtn"),
+        promptEditBtn: $("#promptEditBtn"),
+        promptCopyBtn: $("#promptCopyBtn"),
+        promptTabs: $$("[data-prompt-tab]"),
+        historyDialog: $("#historyDialog"),
+        closeHistoryBtn: $("#closeHistoryBtn"),
+        historySearch: $("#historySearch"),
+        historyList: $("#historyList"),
+        historyCount: $("#historyCount"),
+        clearHistoryBtn: $("#clearHistoryBtn")
       };
 
       /* ============================================================
@@ -3606,8 +4191,36 @@
         }
       }
 
+      function readSession(key) {
+        try {
+          return window.sessionStorage.getItem(key);
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function writeSession(key, value) {
+        try {
+          window.sessionStorage.setItem(key, value);
+        } catch (error) {
+          /* 私密模式或儲存空間不足時，靜默忽略。 */
+        }
+      }
+
+      function removeSession(key) {
+        try {
+          window.sessionStorage.removeItem(key);
+        } catch (error) {
+          /* 忽略 */
+        }
+      }
+
+      function rememberKeyEnabled() {
+        return readStorage(STORAGE_KEYS.rememberKey) !== "0";
+      }
+
       function getCustomApiKey() {
-        return (readStorage(STORAGE_KEYS.apiKey) || "").trim();
+        return (readStorage(STORAGE_KEYS.apiKey) || readSession(STORAGE_KEYS.apiKey) || "").trim();
       }
 
       function getApiKey() {
@@ -3839,6 +4452,7 @@
           button.disabled = !state.selection[button.dataset.reset];
         });
 
+        syncPromptEntry();
         syncOrientationUI();
       }
 
@@ -3951,6 +4565,8 @@
         els.apiKeyInput.type = "password";
         els.apiKeyInput.placeholder = hasBuiltIn ? "使用內建金鑰" : "sk-...";
         els.toggleKeyBtn.setAttribute("aria-label", "顯示金鑰");
+        els.rememberKeyInput.checked = rememberKeyEnabled();
+        els.rememberKeyInput.disabled = hasBuiltIn;
 
         if (hasBuiltIn) {
           els.keyStatus.textContent = "目前使用內建 API 金鑰";
@@ -3986,11 +4602,22 @@
       function saveSettings() {
         if (!(DEEPSEEK_API_KEY || "").trim()) {
           const value = els.apiKeyInput.value.trim();
+          const remember = Boolean(els.rememberKeyInput.checked);
+
           if (value) {
-            writeStorage(STORAGE_KEYS.apiKey, value);
+            if (remember) {
+              writeStorage(STORAGE_KEYS.apiKey, value);
+              removeSession(STORAGE_KEYS.apiKey);
+            } else {
+              writeSession(STORAGE_KEYS.apiKey, value);
+              removeStorage(STORAGE_KEYS.apiKey);
+            }
           } else {
             removeStorage(STORAGE_KEYS.apiKey);
+            removeSession(STORAGE_KEYS.apiKey);
           }
+
+          writeStorage(STORAGE_KEYS.rememberKey, remember ? "1" : "0");
         }
 
         syncSettingsUI();
@@ -4000,6 +4627,7 @@
 
       function clearApiKey() {
         removeStorage(STORAGE_KEYS.apiKey);
+        removeSession(STORAGE_KEYS.apiKey);
         els.apiKeyInput.value = "";
         syncSettingsUI();
         showToast("已清除 API 金鑰");
@@ -4095,7 +4723,111 @@
         return lines.join("\n");
       }
 
-      async function requestReading(prompt) {
+      /* ---------- 追問提示詞：不含知識庫 ---------- */
+
+      function followupSystemPrompt() {
+        return [
+          "你是紫微斗數牌卡解讀師的「追問模式」。",
+          "",
+          "硬性規則：",
+          "1. 只回答使用者這次問的那個問題。不要重寫、不要摘要、不要重複原本的七段解讀。",
+          "2. 必須沿用原本解讀的牌組（主星／輔星／長生，含正逆位）與結論，保持前後一致；若新問題與原解讀有矛盾，先用一句指出差異，再解釋。",
+          "3. 長度按問題難度調整：簡單問題 1–3 句；中等 1–2 段；複雜可分點解釋。全文最多 " + FOLLOWUP_MAX_CHARS + " 個中文字，超過就要精簡。",
+          "4. 不要使用「### 1.」這種固定段落標題；用短段落或條列。",
+          "5. 避免恐嚇、宿命論、絕對化的預言；不提供醫療、法律、投資的具體決策建議。",
+          "6. 一律使用繁體中文（台灣用語），語氣溫暖、務實，像在同一個對話裡接著說。",
+          "7. 不要提到提示詞、知識庫、字數或系統設定。",
+          "",
+          "如果使用者問的是完全無關的程式、數學或時事問題，用一句話說明你只負責這次牌卡解讀的追問，然後把話題帶回牌面。"
+        ].join("\n");
+      }
+
+      function buildFollowupPrompt(reading, question, includeOriginal) {
+        const { selection, orientations } = reading;
+        const questionText = (question || "").trim();
+        const originalQuestion = (reading.question || "").trim();
+        const originalAnswer = (reading.answer || "").trim();
+        const lines = [];
+
+        lines.push(
+          "【本次抽牌結果】",
+          "",
+          "主星：" + selection.main + "（" + orientationLabel(orientations.main) + "）",
+          "輔星：" + selection.support + "（" + orientationLabel(orientations.support) + "）",
+          "長生：" + selection.life + "（" + orientationLabel(orientations.life) + "）",
+          ""
+        );
+
+        lines.push(
+          "【使用者的原始問題】",
+          '"""',
+          originalQuestion || "（未填寫具體問題）",
+          '"""',
+          ""
+        );
+
+        if (includeOriginal && originalAnswer) {
+          const clipped = originalAnswer.length > FOLLOWUP_CONTEXT_MAX
+            ? originalAnswer.slice(0, FOLLOWUP_CONTEXT_MAX) + "\n（原解讀過長，已截斷）"
+            : originalAnswer;
+
+          lines.push(
+            "【原本的解讀】",
+            "以下是同一次解讀的內容，只作為延續語氣與結論的依據，不要重複它。",
+            '"""',
+            clipped,
+            '"""',
+            ""
+          );
+        }
+
+        lines.push("【這次的追問】", '"""', questionText, '"""', "");
+
+        lines.push(
+          "【任務】",
+          "只回答這次的追問，並延續上面的牌面與解讀結論。不要重新輸出七段格式。"
+        );
+
+        return lines.join("\n");
+      }
+
+      function readingSignature(reading) {
+        return JSON.stringify([
+          reading.selection,
+          reading.orientations,
+          (reading.question || "").trim()
+        ]);
+      }
+
+      function followupSignature(reading, question, includeOriginal) {
+        return JSON.stringify([
+          reading && reading.id,
+          (question || "").trim(),
+          Boolean(includeOriginal)
+        ]);
+      }
+
+      function effectiveReadingPrompt(reading) {
+        const draft = state.promptDrafts.reading;
+        if (draft && draft.signature === readingSignature(reading) && draft.text.trim()) {
+          return draft.text;
+        }
+        return buildPrompt(reading);
+      }
+
+      function effectiveFollowupPrompt(reading, question, includeOriginal) {
+        const draft = state.promptDrafts.followup;
+        if (
+          draft &&
+          draft.signature === followupSignature(reading, question, includeOriginal) &&
+          draft.text.trim()
+        ) {
+          return draft.text;
+        }
+        return buildFollowupPrompt(reading, question, includeOriginal);
+      }
+
+      async function postChat(messages, options = {}) {
         const apiKey = getApiKey();
         if (!apiKey) {
           throw new AppError("尚未設定 DeepSeek API 金鑰，請先至設定中填入。", "missing-key");
@@ -4114,17 +4846,10 @@
             },
             body: JSON.stringify({
               model: API_MODEL,
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "你是一位專業的紫微斗數牌卡解讀師，擅長以星曜象徵結合現代心理與生活情境。你會依據使用者提供的紫微牌卡知識庫來解讀牌義與正逆位，並把其中的規則轉化成白話建議。你總是以繁體中文（台灣用語）書寫，語氣溫暖、清晰、務實，重視自我覺察與可行動的建議，從不以恐懼或宿命論推動他人做決定。"
-                },
-                { role: "user", content: prompt }
-              ],
-              temperature: 0.85,
+              messages,
+              temperature: typeof options.temperature === "number" ? options.temperature : 0.85,
               top_p: 0.95,
-              max_tokens: 2400,
+              max_tokens: typeof options.maxTokens === "number" ? options.maxTokens : 2400,
               stream: false
             }),
             signal: controller.signal
@@ -4190,6 +4915,26 @@
         }
       }
 
+      function requestReading(prompt) {
+        return postChat(
+          [
+            { role: "system", content: READING_SYSTEM_PROMPT },
+            { role: "user", content: prompt }
+          ],
+          { maxTokens: 2400, temperature: 0.85 }
+        );
+      }
+
+      function requestFollowup(prompt) {
+        return postChat(
+          [
+            { role: "system", content: followupSystemPrompt() },
+            { role: "user", content: prompt }
+          ],
+          { maxTokens: 1600, temperature: 0.8 }
+        );
+      }
+
       function normalizeError(error) {
         if (error instanceof AppError) {
           return { message: error.message, code: error.code };
@@ -4245,6 +4990,11 @@
       async function startReading() {
         if (state.isReading) return;
 
+        if (state.followupBusy) {
+          showToast("請等這次追問完成後再開始新的解讀", "error");
+          return;
+        }
+
         if (!isComplete()) {
           showToast("請先選好主星、輔星與長生", "error");
           return;
@@ -4261,7 +5011,54 @@
           return;
         }
 
-        const reading = {
+        const reading = collectReading();
+        const prompt = effectiveReadingPrompt(reading);
+
+        state.lastMarkdown = "";
+        state.currentReading = null;
+        els.markdownOut.innerHTML = "";
+        els.followupThread.innerHTML = "";
+        els.followupStatus.textContent = "";
+        els.followupStatus.classList.remove("is-error");
+        els.copyBtn.disabled = true;
+
+        setReadingUI(true);
+        setResultState("loading");
+        startLoadingMessages();
+        scrollToResult();
+
+        try {
+          const content = await requestReading(prompt);
+          state.lastMarkdown = content;
+          state.currentReading = {
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+            at: Date.now(),
+            selection: reading.selection,
+            orientations: reading.orientations,
+            question: reading.question,
+            answer: content,
+            followups: []
+          };
+          els.markdownOut.innerHTML = renderMarkdown(content);
+          renderFollowups();
+          saveHistoryEntry(state.currentReading);
+          setResultState("success");
+          els.copyBtn.disabled = false;
+          showToast("解讀完成，願你看見自己的光");
+        } catch (error) {
+          const normalized = normalizeError(error);
+          showError(normalized.message, normalized.code);
+          setResultState("error");
+          showToast("解讀失敗，請稍後再試", "error");
+        } finally {
+          stopLoadingMessages();
+          setReadingUI(false);
+          syncPromptEntry();
+        }
+      }
+
+      function collectReading() {
+        return {
           selection: {
             main: state.selection.main,
             support: state.selection.support,
@@ -4274,33 +5071,6 @@
           },
           question: els.questionInput.value
         };
-        const prompt = buildPrompt(reading);
-
-        state.lastMarkdown = "";
-        els.markdownOut.innerHTML = "";
-        els.copyBtn.disabled = true;
-
-        setReadingUI(true);
-        setResultState("loading");
-        startLoadingMessages();
-        scrollToResult();
-
-        try {
-          const content = await requestReading(prompt);
-          state.lastMarkdown = content;
-          els.markdownOut.innerHTML = renderMarkdown(content);
-          setResultState("success");
-          els.copyBtn.disabled = false;
-          showToast("解讀完成，願你看見自己的光");
-        } catch (error) {
-          const normalized = normalizeError(error);
-          showError(normalized.message, normalized.code);
-          setResultState("error");
-          showToast("解讀失敗，請稍後再試", "error");
-        } finally {
-          stopLoadingMessages();
-          setReadingUI(false);
-        }
       }
 
       /* ============================================================
@@ -4574,6 +5344,576 @@
       }
 
       /* ============================================================
+         9b. 追問
+         ============================================================ */
+
+      function updateFollowupMeta() {
+        els.followupCount.textContent = els.followupInput.value.length + " / " + FOLLOWUP_MAX_INPUT;
+      }
+
+      function autoGrowFollowup() {
+        const input = els.followupInput;
+        input.style.height = "auto";
+        input.style.height = Math.min(input.scrollHeight, 150) + "px";
+      }
+
+      function renderFollowups() {
+        const reading = state.currentReading;
+        els.followupThread.innerHTML = "";
+        if (!reading || !reading.followups.length) return;
+
+        reading.followups.forEach((item) => {
+          const wrap = document.createElement("div");
+          wrap.className = "followup-item";
+
+          const question = document.createElement("p");
+          question.className = "followup-q";
+
+          const tag = document.createElement("span");
+          tag.className = "followup-tag";
+          tag.textContent = "追問";
+
+          const text = document.createElement("span");
+          text.textContent = item.question;
+
+          question.append(tag, text);
+
+          const answer = document.createElement("div");
+          answer.className = "prose followup-a";
+          answer.innerHTML = renderMarkdown(item.answer || "");
+
+          const actions = document.createElement("div");
+          actions.className = "followup-item-actions";
+
+          const copy = document.createElement("button");
+          copy.type = "button";
+          copy.className = "btn btn-ghost btn-sm";
+          copy.textContent = "複製這則";
+          copy.addEventListener("click", async () => {
+            const ok = await copyText("【追問】\n" + item.question + "\n\n" + (item.answer || ""));
+            showToast(
+              ok ? "已複製追問內容" : "複製失敗，請手動選取內容",
+              ok ? "success" : "error"
+            );
+          });
+
+          actions.appendChild(copy);
+          wrap.append(question, answer, actions);
+          els.followupThread.appendChild(wrap);
+        });
+      }
+
+      async function sendFollowup() {
+        const reading = state.currentReading;
+        if (!reading || state.followupBusy || state.isReading) return;
+
+        const question = els.followupInput.value.trim();
+        if (!question) {
+          showToast("請先輸入想追問的內容", "error");
+          els.followupInput.focus();
+          return;
+        }
+
+        if (!getApiKey()) {
+          openSettings();
+          return;
+        }
+
+        const includeOriginal = Boolean(els.includeOriginalToggle.checked);
+        const prompt = effectiveFollowupPrompt(reading, question, includeOriginal);
+        const label = $("[data-followup-label]", els.followupBtn);
+
+        state.followupBusy = true;
+        els.followupBtn.disabled = true;
+        els.followupBtn.classList.add("is-loading");
+        els.followupInput.disabled = true;
+        els.includeOriginalToggle.disabled = true;
+        if (label) label.textContent = "整理中…";
+        els.followupStatus.textContent = "正在整理追問…";
+        els.followupStatus.classList.remove("is-error");
+
+        try {
+          const answer = await requestFollowup(prompt);
+          reading.followups.push({
+            question,
+            answer,
+            at: Date.now(),
+            includeOriginal
+          });
+          state.promptDrafts.followup = null;
+          els.followupInput.value = "";
+          updateFollowupMeta();
+          autoGrowFollowup();
+          renderFollowups();
+          updateHistoryEntry(reading);
+          els.followupStatus.textContent = "追問完成。";
+          const last = els.followupThread.lastElementChild;
+          if (last) {
+            last.scrollIntoView({
+              behavior: prefersReducedMotion() ? "auto" : "smooth",
+              block: "nearest"
+            });
+          }
+        } catch (error) {
+          const normalized = normalizeError(error);
+          els.followupStatus.textContent = normalized.message;
+          els.followupStatus.classList.add("is-error");
+        } finally {
+          state.followupBusy = false;
+          els.followupBtn.disabled = false;
+          els.followupBtn.classList.remove("is-loading");
+          els.followupInput.disabled = false;
+          els.includeOriginalToggle.disabled = false;
+          if (label) label.textContent = "送出追問";
+        }
+      }
+
+      /* ============================================================
+         9c. 提示詞面板
+         ============================================================ */
+
+      function promptAvailable(tab) {
+        return tab === "followup" ? Boolean(state.currentReading) : isComplete();
+      }
+
+      function activePromptDraft(tab) {
+        const draft = state.promptDrafts[tab];
+        if (!draft || draft.signature !== promptSignatureFor(tab) || !draft.text.trim()) {
+          return null;
+        }
+        return draft;
+      }
+
+      function generatedPrompt(tab) {
+        if (tab === "followup") {
+          const reading = state.currentReading;
+          if (!reading) return "";
+          const question = els.followupInput.value.trim();
+          if (!question) {
+            return "（請先在上方的追問欄輸入問題，這裡會即時顯示實際送出的提示詞。）";
+          }
+          return buildFollowupPrompt(
+            reading,
+            question,
+            Boolean(els.includeOriginalToggle.checked)
+          );
+        }
+        return buildPrompt(collectReading());
+      }
+
+      function promptSignatureFor(tab) {
+        if (tab === "followup") {
+          return followupSignature(
+            state.currentReading,
+            els.followupInput.value,
+            Boolean(els.includeOriginalToggle.checked)
+          );
+        }
+        return readingSignature(collectReading());
+      }
+
+      function currentPromptText(tab) {
+        const draft = activePromptDraft(tab);
+        return draft ? draft.text : generatedPrompt(tab);
+      }
+
+      function renderPromptPanel() {
+        const tab = state.promptTab;
+        const available = promptAvailable(tab);
+
+        els.promptTabs.forEach((button) => {
+          const name = button.dataset.promptTab;
+          button.setAttribute("aria-selected", String(name === tab));
+          button.disabled = !promptAvailable(name);
+          const dot = $('[data-edited-for="' + name + '"]', button);
+          if (dot) dot.hidden = !activePromptDraft(name);
+        });
+
+        const text = available ? currentPromptText(tab) : "";
+        els.promptView.textContent = text || "（尚未有可預覽的提示詞）";
+        els.promptView.hidden = state.promptEditing;
+        els.promptEditor.hidden = !state.promptEditing;
+
+        const length = state.promptEditing ? els.promptEditor.value.length : text.length;
+        els.promptCount.textContent = length + " 字";
+
+        const draft = activePromptDraft(tab);
+        els.promptHint.textContent = draft
+          ? "已編輯 · 送出時會使用你改過的版本"
+          : "唯讀模式 · 看到的內容就是送出的內容";
+        els.promptHint.classList.toggle("is-dirty", Boolean(draft));
+        els.promptEditBtn.textContent = state.promptEditing ? "完成" : "編輯";
+        els.promptEditBtn.disabled = !available;
+        els.promptCopyBtn.disabled = !available;
+        els.promptResetBtn.disabled = !draft;
+
+        els.promptSystem.textContent = tab === "followup"
+          ? followupSystemPrompt()
+          : READING_SYSTEM_PROMPT;
+        els.promptParams.textContent = tab === "followup"
+          ? "model: " + API_MODEL + " · temperature: 0.8 · top_p: 0.95 · max_tokens: 1600 · stream: false"
+          : "model: " + API_MODEL + " · temperature: 0.85 · top_p: 0.95 · max_tokens: 2400 · stream: false";
+      }
+
+      function commitPromptEdit() {
+        if (!state.promptEditing) return;
+
+        const tab = state.promptTab;
+        const value = els.promptEditor.value;
+        const generated = generatedPrompt(tab);
+
+        if (value.trim() && value !== generated) {
+          state.promptDrafts[tab] = {
+            signature: promptSignatureFor(tab),
+            text: value
+          };
+        } else {
+          state.promptDrafts[tab] = null;
+        }
+
+        state.promptEditing = false;
+      }
+
+      function setPromptTab(tab) {
+        if (!promptAvailable(tab)) return;
+        commitPromptEdit();
+        state.promptTab = tab;
+        state.promptEditing = false;
+        renderPromptPanel();
+      }
+
+      function togglePromptEdit() {
+        if (state.promptEditing) {
+          commitPromptEdit();
+          renderPromptPanel();
+          return;
+        }
+
+        if (!promptAvailable(state.promptTab)) return;
+
+        state.promptEditing = true;
+        els.promptEditor.value = currentPromptText(state.promptTab);
+        renderPromptPanel();
+        els.promptEditor.focus();
+      }
+
+      function resetPrompt() {
+        state.promptDrafts[state.promptTab] = null;
+        state.promptEditing = false;
+        renderPromptPanel();
+        showToast("已還原成預設提示詞");
+      }
+
+      function openPromptPanel(preferredTab) {
+        if (!isComplete() && !state.currentReading) {
+          showToast("請先選好三張牌", "error");
+          return;
+        }
+
+        const tab = preferredTab && promptAvailable(preferredTab)
+          ? preferredTab
+          : (isComplete() ? "reading" : "followup");
+
+        state.promptTab = promptAvailable(tab) ? tab : "reading";
+        state.promptEditing = false;
+        renderPromptPanel();
+
+        if (els.promptDialog.open) return;
+        if (typeof els.promptDialog.showModal === "function") {
+          els.promptDialog.showModal();
+        } else {
+          els.promptDialog.setAttribute("open", "");
+        }
+      }
+
+      function closePromptPanel() {
+        commitPromptEdit();
+        if (typeof els.promptDialog.close === "function") {
+          els.promptDialog.close();
+        } else {
+          els.promptDialog.removeAttribute("open");
+        }
+      }
+
+      async function copyPrompt() {
+        commitPromptEdit();
+        renderPromptPanel();
+
+        const text = currentPromptText(state.promptTab);
+        if (!text) {
+          showToast("目前沒有可複製的提示詞", "error");
+          return;
+        }
+
+        const ok = await copyText(text);
+        showToast(
+          ok ? "已複製提示詞" : "複製失敗，請手動選取內容",
+          ok ? "success" : "error"
+        );
+      }
+
+      function syncPromptEntry() {
+        els.promptBtn.disabled = !isComplete() && !state.currentReading;
+      }
+
+      /* ============================================================
+         9d. 解讀紀錄
+         ============================================================ */
+
+      function isHistoryEntry(entry) {
+        return Boolean(
+          entry &&
+          typeof entry === "object" &&
+          entry.selection &&
+          entry.orientations &&
+          typeof entry.answer === "string"
+        );
+      }
+
+      function loadHistory() {
+        const raw = readStorage(STORAGE_KEYS.history);
+        if (!raw) return [];
+        try {
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          return parsed.filter(isHistoryEntry).slice(0, HISTORY_LIMIT);
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function persistHistory() {
+        writeStorage(STORAGE_KEYS.history, JSON.stringify(state.history.slice(0, HISTORY_LIMIT)));
+      }
+
+      function historySnapshot(reading) {
+        return {
+          id: reading.id,
+          at: reading.at || Date.now(),
+          selection: {
+            main: reading.selection.main,
+            support: reading.selection.support,
+            life: reading.selection.life
+          },
+          orientations: {
+            main: Boolean(reading.orientations.main),
+            support: Boolean(reading.orientations.support),
+            life: Boolean(reading.orientations.life)
+          },
+          question: reading.question || "",
+          answer: reading.answer,
+          followups: (reading.followups || []).map((item) => ({
+            question: item.question,
+            answer: item.answer,
+            at: item.at,
+            includeOriginal: Boolean(item.includeOriginal)
+          }))
+        };
+      }
+
+      function saveHistoryEntry(reading) {
+        if (!reading || !reading.id) return;
+        const entry = historySnapshot(reading);
+        state.history = [entry, ...state.history.filter((item) => item.id !== entry.id)]
+          .slice(0, HISTORY_LIMIT);
+        persistHistory();
+        if (els.historyDialog.open) renderHistory();
+      }
+
+      function updateHistoryEntry(reading) {
+        saveHistoryEntry(reading);
+      }
+
+      function historyCardsLabel(entry) {
+        const mark = (kind) => (entry.orientations[kind] ? "逆" : "正");
+        return [
+          entry.selection.main + "（" + mark("main") + "）",
+          entry.selection.support + "（" + mark("support") + "）",
+          entry.selection.life + "（" + mark("life") + "）"
+        ].join(" · ");
+      }
+
+      function historyDateLabel(timestamp) {
+        try {
+          return new Date(timestamp).toLocaleString("zh-TW", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+        } catch (error) {
+          return "";
+        }
+      }
+
+      function renderHistory(filterText) {
+        const term = String(filterText || "").trim().toLowerCase();
+        const matches = state.history.filter((entry) => {
+          if (!term) return true;
+          const haystack = [
+            historyCardsLabel(entry),
+            entry.question || "",
+            entry.answer || "",
+            (entry.followups || []).map((item) => item.question + " " + item.answer).join(" ")
+          ].join(" ").toLowerCase();
+          return haystack.includes(term);
+        });
+
+        els.historyList.innerHTML = "";
+
+        if (!matches.length) {
+          const empty = document.createElement("p");
+          empty.className = "history-empty";
+          empty.textContent = state.history.length
+            ? "找不到符合搜尋條件的紀錄。"
+            : "還沒有紀錄。完成一次解讀後，會自動保存在這部裝置。";
+          els.historyList.appendChild(empty);
+        }
+
+        matches.forEach((entry) => {
+          const item = document.createElement("div");
+          item.className = "history-item";
+
+          const head = document.createElement("div");
+          head.className = "history-item-head";
+
+          const cards = document.createElement("p");
+          cards.className = "history-cards";
+          cards.textContent = historyCardsLabel(entry);
+
+          const meta = document.createElement("p");
+          meta.className = "history-meta";
+          meta.textContent = historyDateLabel(entry.at) +
+            (entry.followups && entry.followups.length ? " · 追問 " + entry.followups.length : "");
+
+          head.append(cards, meta);
+
+          const question = document.createElement("p");
+          question.className = "history-question";
+          question.textContent = (entry.question || "").trim()
+            ? "問題：" + entry.question.trim()
+            : "問題：未填寫";
+
+          const excerpt = document.createElement("p");
+          excerpt.className = "history-excerpt";
+          excerpt.textContent = (entry.answer || "")
+            .replace(/^#{1,6}\s+/gm, "")
+            .replace(/\*\*/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 140);
+
+          const actions = document.createElement("div");
+          actions.className = "history-item-actions";
+
+          const load = document.createElement("button");
+          load.type = "button";
+          load.className = "btn btn-ghost btn-sm";
+          load.textContent = "載入";
+          load.addEventListener("click", () => restoreHistoryEntry(entry.id));
+
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "btn btn-ghost btn-sm";
+          remove.textContent = "刪除";
+          remove.addEventListener("click", () => deleteHistoryEntry(entry.id));
+
+          actions.append(load, remove);
+          item.append(head, question, excerpt, actions);
+          els.historyList.appendChild(item);
+        });
+
+        els.historyCount.textContent = term
+          ? matches.length + " / " + state.history.length + " 筆"
+          : state.history.length + " 筆";
+        els.clearHistoryBtn.disabled = !state.history.length;
+      }
+
+      function openHistory() {
+        els.historySearch.value = "";
+        renderHistory("");
+        if (els.historyDialog.open) return;
+        if (typeof els.historyDialog.showModal === "function") {
+          els.historyDialog.showModal();
+        } else {
+          els.historyDialog.setAttribute("open", "");
+        }
+      }
+
+      function closeHistory() {
+        if (typeof els.historyDialog.close === "function") {
+          els.historyDialog.close();
+        } else {
+          els.historyDialog.removeAttribute("open");
+        }
+      }
+
+      function deleteHistoryEntry(id) {
+        state.history = state.history.filter((entry) => entry.id !== id);
+        persistHistory();
+        renderHistory(els.historySearch.value);
+        showToast("已刪除這筆紀錄");
+      }
+
+      function clearHistory() {
+        if (!state.history.length) return;
+        if (!window.confirm("確定要清空全部解讀紀錄嗎？此動作無法復原。")) return;
+        state.history = [];
+        persistHistory();
+        renderHistory("");
+        showToast("已清空解讀紀錄");
+      }
+
+      function restoreHistoryEntry(id) {
+        const entry = state.history.find((item) => item.id === id);
+        if (!entry) return;
+
+        if (state.followupBusy) {
+          showToast("請等這次追問完成後再載入紀錄", "error");
+          return;
+        }
+
+        state.promptDrafts.reading = null;
+        state.promptDrafts.followup = null;
+        state.promptEditing = false;
+
+        KINDS.forEach((kind) => {
+          const value = entry.selection[kind];
+          state.selection[kind] = VALID_CARDS[kind].includes(value) ? value : null;
+          state.orientations[kind] = Boolean(entry.orientations[kind]) && Boolean(state.selection[kind]);
+          syncSelectionUI(kind);
+        });
+
+        els.questionInput.value = entry.question || "";
+        state.question = els.questionInput.value;
+        updateQuestionMeta();
+        autoGrowQuestion();
+        persistSelection();
+        persistOrientations();
+        updateSummary();
+
+        state.currentReading = {
+          id: entry.id,
+          at: entry.at,
+          selection: { ...entry.selection },
+          orientations: { ...entry.orientations },
+          question: entry.question || "",
+          answer: entry.answer,
+          followups: (entry.followups || []).map((item) => ({ ...item }))
+        };
+        state.lastMarkdown = entry.answer;
+        els.markdownOut.innerHTML = renderMarkdown(entry.answer);
+        els.followupStatus.textContent = "";
+        els.followupStatus.classList.remove("is-error");
+        renderFollowups();
+        setResultState("success");
+        els.copyBtn.disabled = false;
+        closeHistory();
+        scrollToResult();
+        showToast("已載入這筆解讀");
+      }
+
+      /* ============================================================
          10. 事件綁定與初始化
          ============================================================ */
 
@@ -4624,6 +5964,45 @@
         });
         els.errorSettingsBtn.addEventListener("click", openSettings);
         els.copyBtn.addEventListener("click", copyReading);
+        els.promptBtn.addEventListener("click", () => openPromptPanel("reading"));
+        els.historyBtn.addEventListener("click", openHistory);
+
+        // 追問
+        els.followupBtn.addEventListener("click", sendFollowup);
+        els.followupInput.addEventListener("input", () => {
+          updateFollowupMeta();
+          autoGrowFollowup();
+        });
+        els.followupInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+            event.preventDefault();
+            sendFollowup();
+          }
+        });
+
+        // 提示詞面板
+        els.promptTabs.forEach((button) => {
+          button.addEventListener("click", () => setPromptTab(button.dataset.promptTab));
+        });
+        els.promptEditBtn.addEventListener("click", togglePromptEdit);
+        els.promptResetBtn.addEventListener("click", resetPrompt);
+        els.promptCopyBtn.addEventListener("click", copyPrompt);
+        els.promptEditor.addEventListener("input", () => {
+          if (!state.promptEditing) return;
+          els.promptCount.textContent = els.promptEditor.value.length + " 字";
+        });
+        els.closePromptBtn.addEventListener("click", closePromptPanel);
+        els.promptDialog.addEventListener("click", (event) => {
+          if (event.target === els.promptDialog) closePromptPanel();
+        });
+
+        // 解讀紀錄
+        els.historySearch.addEventListener("input", () => renderHistory(els.historySearch.value));
+        els.clearHistoryBtn.addEventListener("click", clearHistory);
+        els.closeHistoryBtn.addEventListener("click", closeHistory);
+        els.historyDialog.addEventListener("click", (event) => {
+          if (event.target === els.historyDialog) closeHistory();
+        });
 
         // 主題
         els.themeToggle.addEventListener("click", () => {
@@ -4674,9 +6053,11 @@
         renderCards(els.supportCards, SUPPORT_CARDS, "support");
         renderCards(els.lifeStages, LIFE_STAGES, "life");
 
+        state.history = loadHistory();
         restoreSelection();
         KINDS.forEach(syncSelectionUI);
         updateQuestionMeta();
+        updateFollowupMeta();
         updateSummary();
         setResultState("idle");
         applyTheme(getThemePreference(), { persist: false, animate: false });
