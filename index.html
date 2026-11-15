@@ -2166,6 +2166,30 @@
       line-height: 1.75;
     }
 
+    .prompt-question {
+      margin-top: 12px;
+    }
+
+    .prompt-question[hidden] {
+      display: none;
+    }
+
+    .prompt-question .question-input {
+      background: var(--card);
+    }
+
+    .prompt-question .question-input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .prompt-question-hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1.55;
+    }
+
     .prompt-view,
     .prompt-editor {
       width: 100%;
@@ -3102,7 +3126,7 @@
 
             <div class="followup-form">
               <div class="question-field">
-                <label class="question-label" for="followupInput">想再深入的地方<span>選填 · 500 字內</span></label>
+                <label class="question-label" for="followupInput">追問問題<span>選填 · 500 字內</span></label>
                 <textarea
                   class="question-input"
                   id="followupInput"
@@ -3112,7 +3136,7 @@
                   placeholder="例如：那我接下來三個月該先處理哪一件事？"
                 ></textarea>
                 <div class="question-meta">
-                  <span>追問不會重寫整份解讀，只回答你這次問的事。</span>
+                  <span>輸入內容會放入「追問」提示詞；追問只回答這次問題，不會重寫整份解讀。</span>
                   <span id="followupCount">0 / 500</span>
                 </div>
               </div>
@@ -3214,6 +3238,19 @@
       <div class="prompt-tabs" role="tablist" aria-label="提示詞種類">
         <button class="prompt-tab" id="promptTabReading" type="button" role="tab" data-prompt-tab="reading" aria-selected="true">初次解讀<span class="edited-dot" data-edited-for="reading" hidden>已編輯</span></button>
         <button class="prompt-tab" id="promptTabFollowup" type="button" role="tab" data-prompt-tab="followup" aria-selected="false" disabled>追問<span class="edited-dot" data-edited-for="followup" hidden>已編輯</span></button>
+      </div>
+
+      <div class="question-field prompt-question" id="promptQuestionWrap" hidden>
+        <label class="question-label" for="promptQuestion">追問問題<span>選填 · 500 字內</span></label>
+        <textarea
+          class="question-input"
+          id="promptQuestion"
+          rows="2"
+          maxlength="500"
+          spellcheck="false"
+          placeholder="例如：那我接下來三個月該先處理哪一件事？"
+        ></textarea>
+        <p class="prompt-question-hint" id="promptQuestionHint">留空時，提示詞會使用範本問題。</p>
       </div>
 
       <pre class="prompt-view" id="promptView" tabindex="0" aria-label="提示詞內容"></pre>
@@ -4191,6 +4228,9 @@
         closePromptBtn: $("#closePromptBtn"),
         promptView: $("#promptView"),
         promptEditor: $("#promptEditor"),
+        promptQuestionWrap: $("#promptQuestionWrap"),
+        promptQuestion: $("#promptQuestion"),
+        promptQuestionHint: $("#promptQuestionHint"),
         promptCount: $("#promptCount"),
         promptHint: $("#promptHint"),
         promptSystem: $("#promptSystem"),
@@ -5671,6 +5711,24 @@
           if (dot) dot.hidden = !activePromptDraft(name);
         });
 
+        const isFollowup = tab === "followup";
+        els.promptQuestionWrap.hidden = !isFollowup;
+        if (isFollowup) {
+          if (els.promptQuestion.value !== els.followupInput.value) {
+            els.promptQuestion.value = els.followupInput.value;
+          }
+          els.promptQuestion.style.height = "auto";
+          els.promptQuestion.style.height = Math.min(els.promptQuestion.scrollHeight, 150) + "px";
+          els.promptQuestion.disabled = state.promptEditing;
+          els.promptQuestionHint.textContent = state.promptEditing
+            ? "編輯提示詞時，請直接在下方文字框調整。"
+            : (!state.currentReading
+                ? "這份提示詞只含牌面與問題，不含知識庫；留空時會使用範本問題。"
+                : (els.includeOriginalToggle.checked
+                    ? "送出追問時會一併帶入原解讀；可在結果區取消勾選。"
+                    : "目前不帶入原解讀，只送牌面與問題。"));
+        }
+
         const text = available ? currentPromptText(tab) : "";
         els.promptView.textContent = text || "（尚未有可預覽的提示詞）";
         els.promptView.hidden = state.promptEditing;
@@ -5683,9 +5741,9 @@
         if (draft) {
           els.promptHint.textContent = "已編輯 · 送出時會使用你改過的版本";
         } else if (tab === "followup" && !state.currentReading) {
-          els.promptHint.textContent = "尚未有原解讀 · 只含牌面與問題，可按「編輯」換成你的追問";
+          els.promptHint.textContent = "尚未有原解讀 · 只含牌面與問題；可在上方填入追問，或按「編輯」改寫";
         } else if (tab === "followup" && !els.followupInput.value.trim()) {
-          els.promptHint.textContent = "尚未輸入追問 · 目前是可直接複製的範本，可按「編輯」換成你的問題";
+          els.promptHint.textContent = "尚未輸入追問 · 可在上方填入，這裡會即時更新；目前顯示可直接複製的範本";
         } else {
           els.promptHint.textContent = "唯讀模式 · 看到的內容就是送出的內容";
         }
@@ -6124,6 +6182,12 @@
         els.followupInput.addEventListener("input", () => {
           updateFollowupMeta();
           autoGrowFollowup();
+          if (els.promptQuestion.value !== els.followupInput.value) {
+            els.promptQuestion.value = els.followupInput.value;
+          }
+          if (els.promptDialog.open && state.promptTab === "followup" && !state.promptEditing) {
+            renderPromptPanel();
+          }
         });
         els.followupInput.addEventListener("keydown", (event) => {
           if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
@@ -6142,6 +6206,14 @@
         els.promptEditor.addEventListener("input", () => {
           if (!state.promptEditing) return;
           els.promptCount.textContent = els.promptEditor.value.length + " 字";
+        });
+        els.promptQuestion.addEventListener("input", () => {
+          if (els.followupInput.value !== els.promptQuestion.value) {
+            els.followupInput.value = els.promptQuestion.value;
+            updateFollowupMeta();
+            autoGrowFollowup();
+          }
+          renderPromptPanel();
         });
         els.closePromptBtn.addEventListener("click", closePromptPanel);
         els.promptDialog.addEventListener("click", (event) => {
